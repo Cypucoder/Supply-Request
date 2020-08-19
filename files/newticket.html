@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+    <title></title>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    
+    <!--The following is needed for angular data return compatibility between all browsers. Even though some of it is commented out, it's actually being read by IE or another browser. -->
+    
+    <!--[if (IE)]><script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.29/angular.min.js"></script>
+                  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.29/angular-cookies.js"></script>
+<![endif]-->
+    
+    <!--[if !(IE)]><!-->  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-cookies.js"></script>
+<!--<![endif]-->
+    
+<!--http://stackoverflow.com/questions/9900311/how-do-i-target-only-internet-explorer-10-for-certain-situations-like-internet-e -->    
+   <script>
+    /*@cc_on
+      @if (@_jscript_version == 10)
+          document.write('<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.29/angular.js"/><script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.29/angular-cookies.js">');
+      @end
+    @*/
+</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular-messages.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
+    <script src="./socket.io-1.2.0.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js'></script>
+    <link rel="stylesheet" href="./css/IT.css">
+    
+    <!-- Code js is used for defining how data is returned. Turning multiple sql statements and more into something as simple as {{x.variable}} -->
+    <script src="./code.js"></script>
+    
+        <script src="./checklist-model.js"></script>
+    <!--CSS for sidebar -->
+    <!--<link href="./css/simple-sidebar.css" rel="stylesheet">-->
+  
+</head>
+    <!--myApp defines the web application information -->
+<body ng-app="myApp" ng-controller="data_get">
+    
+    <!--Navbar -->
+<nav role="navigation" class="navbar navbar-default" style="position: fixed; top: 0; width: 100%; z-index: 5;">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">Elyria Library Office Supply Order Form</a>
+            </div>
+            <!-- Collection of nav links and other content for toggling -->
+            <div id="navbarCollapse" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <!--<li><a href="#">Login</a></li>-->
+                </ul>
+            </div>
+        </nav>
+<div id="main" data>
+        <div style="margin-top:70px;"></div> 
+        
+        <!--ng-form and most things that start with "ng" are angulars replacement for html things. Yes it's stupid I know. :/ -->
+    <ng-form id="ticket" name="ticket" action="" novalidate>
+        
+        <div ng-controller="data_get">
+            <div class="col-xs-12" style="background: #FFAEAE; margin-bottom: 20px;">Please fill out Email, Building, and Department</div>
+            <div class="col-xs-3">
+                <label>Email: <input type="input" ng-model="ticket.fEmail"></label>
+            </div>
+            <div class="col-xs-3">
+                <label class="form-inline">Building:  
+                    <select style="width: 170px;" class="form-control input-sm form-inline" id="sel1" ng-model="ticket.fBuilding">
+                            <option value="Central">Central</option>
+                            <option value="North">North</option>
+                            <option value="South">South</option>
+                            <option value="West River">West River</option>
+                            <option value="Keystone">Keystone</option>
+                            <option value="Bookmobile">Bookmobile</option>
+                        </select>
+                    <!--<input type="input" ng-model="ticket.fBuilding">--></label>
+            </div>
+            <div class="col-xs-3">
+                <label class="form-inline">Department: <select style="width: 170px;" class="form-control input-sm form-inline" id="department" ng-model="ticket.fLocation">
+                    <option value="Other">Other</option>
+                    <option value="Circulation">Circulation</option>
+                    <option value="Reference">Reference</option>
+                    <option value="Youth Services">Youth Services</option>
+                    <option value="Public Relations">Public Relations</option>
+                    <option value="Bookmobile">Bookmobile</option>
+                    <option value="Technical Service">Technical Service</option>
+                    <option value="IT">Technical Service</option>
+                    
+                </select><!--<input type="input" ng-model="ticket.fLocation">--></label>
+            </div>
+            <div class ="col-xs-12">{{message}}</div>
+            <div class="col-xs-12"></div>
+            
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion1" data-target="#collapse1">Writing Utensils</a>
+                        </h4>
+                    </div>
+                    <div id="collapse1" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BicPens" ng-true-value="1" ng-false-value="''">Bic Pens</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Bic Pens</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BicBlue" ng-true-value="'Blue'" ng-false-value="''"> Blue</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BicBlack" ng-true-value="'Black'" ng-false-value="''"> Black</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Color: <input type="input" ng-model="ticket.ColorBicPen"></label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Pens <input type="input" ng-model="ticket.NumOBic"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.ChiselTipHighlighters" ng-true-value="1" ng-false-value="''">Chisel Tip Highlighters</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Chisel Tip Highlighters</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.ChisHighAssorted" ng-true-value="'Assorted'" ng-false-value="''"> Assorted</label>
+                                </div>
+
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.ChisHighOther" ng-true-value="'Other'" ng-false-value="''">Other</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <label>Color: <input type="input" ng-model="ticket.ColorHighLighter"></label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Highlighters <input type="input" ng-model="ticket.NumOChisel"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.DryEraseMarkers" ng-true-value="1" ng-false-value="''">Dry Erase Markers</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Dry Erase Markers</h4>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of Markers <input type="input" ng-model="ticket.NumODryEraseMarkers"></label>
+                                </div>            
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.DryErasers" ng-true-value="1" ng-false-value="''">Dry Erasers</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Dry Erasers</h4>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of Erasers <input type="input" ng-model="ticket.NumODryErasers"></label>
+                                </div>            
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.FlipChartMarkers" ng-true-value="1" ng-false-value="''">Flip Chart Markers</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Flip Chart Markers</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Markers <input type="input" ng-model="ticket.NumOFlipChart"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.Sharpies" ng-true-value="1" ng-false-value="''">Sharpies</label>
+                                </div>-->  
+
+                                <div class="col-xs-12">
+                                    <h4>Sharpies</h4>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.SharpiesFinePoint" ng-true-value="'Fine Point'" ng-false-value="''"> Fine Point</label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.SharpiesLarge" ng-true-value="'Large'" ng-false-value="''"> Large</label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of Sharpies <input type="input" ng-model="ticket.NumOSharpies"></label>
+                                </div>            
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion2" data-target="#collapse2">Paper</a>
+                        </h4>
+                    </div>
+                    <div id="collapse2" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.LegalPads" ng-true-value="1" ng-false-value="''">Legal Pads</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Legal Pads</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.LPadsWhite" ng-true-value="'White'" ng-false-value="''"> White</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.LPadsYellow" ng-true-value="'Yellow'" ng-false-value="''"> Yellow</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Legal Pads <input type="input" ng-model="ticket.NumOLegalPads"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.FiveSevPads" ng-true-value="1" ng-false-value="''">5x7 pads</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>5x7 pads</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.FiveSevWhite" ng-true-value="'White'" ng-false-value="''"> White</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.FiveSevYellow" ng-true-value="'Yellow'" ng-false-value="''"> Yellow</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of 5x7 pads <input type="input" ng-model="ticket.NumOFiveSevPads"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.InterofficeEnvelopes" ng-true-value="1" ng-false-value="''">Interoffice Envelopes</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Interoffice Envelopes</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of envelopes <input type="input" ng-model="ticket.NumOInterOffice"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.InterofficeEnvelopes" ng-true-value="1" ng-false-value="''">Interoffice Envelopes</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Copy Paper</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CopyPaper1" ng-true-value="'8 1/2 x 11'" ng-false-value="''"> 8 1/2 x 11</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CopyPaper2" ng-true-value="'8 1/2 x 14'" ng-false-value="''"> 8 1/2 x 14</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CopyPaper3" ng-true-value="'11 x 17'" ng-false-value="''"> 11 x 17</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Reams <input type="input" ng-model="ticket.NumCopyPaper"></label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Cases <input type="input" ng-model="ticket.NumCasePaper"></label>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion3" data-target="#collapse3">Organization</a>
+                        </h4>
+                    </div>
+                    <div id="collapse3" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.FileFolders" ng-true-value="1" ng-false-value="''">File Folders</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>File Folders</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.FFLetter" ng-true-value="'Letter'" ng-false-value="''"> Letter</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.FFLegal" ng-true-value="'Legal'" ng-false-value="''"> Legal</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of File Folders <input type="input" ng-model="ticket.NumOFileFolders"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.HangingFileFolders" ng-true-value="1" ng-false-value="''">Hanging File Folders</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Hanging File Folders</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.HangFFLegal" ng-true-value="'Legal'" ng-false-value="''"> Legal</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.HangFFLetter" ng-true-value="'Letter'" ng-false-value="''"> Letter</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Hanging FF <input type="input" ng-model="ticket.NumOHangFileFold"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.PocketFolders" ng-true-value="1" ng-false-value="''">Pocket Folders</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Pocket Folders</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.PockOther" ng-true-value="'Other'" ng-false-value="''"> Other</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.PockRed" ng-true-value="'Red'" ng-false-value="''"> Red</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Folders <input type="input" ng-model="ticket.NumOPockFolders"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.AlphaDividers" ng-true-value="1" ng-false-value="''">Alpha Dividers</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Alpha Dividers</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Dividers <input type="input" ng-model="ticket.NumOAlphaDiv"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.NumericalDividers" ng-true-value="1" ng-false-value="''">Numerical Dividers</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Numerical Dividers</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Dividers <input type="input" ng-model="ticket.NumONumDiv"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.TabDividers" ng-true-value="1" ng-false-value="''">Tab Dividers</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Tab Dividers</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Type: 
+                                        <select class="form-control input-sm" id="sel1" ng-model="ticket.TabType">
+                                            <option value="Monthly">Monthly</option>
+                                            <option value="Numerical">Numerical</option>
+                                        </select></label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Type: 
+                                        <select class="form-control input-sm" id="sel1" ng-model="ticket.ColorDividers">
+                                            <option value="White">White</option>
+                                            <option value="Yellow">Yellow</option>
+                                        </select></label>
+                                </div>
+                                <!--<div class="col-xs-12">
+                                    <label>Color: <input type="input" ng-model="ticket.ColorDividers"></label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <label># of Tab Dividers <input type="input" ng-model="ticket.NumOTabDiv"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.Binders" ng-true-value="1" ng-false-value="''">Binders</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Binders</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Size: 
+                                        <select class="form-control input-sm" id="sel1" ng-model="ticket.BindSize">
+                                            <option value="1/2Inch">1/2 inch</option>
+                                            <option value="1inch">1 inch</option>
+                                            <option value="1.5inches">1.5 inches</option>
+                                            <option value="2inches">2 inches</option>
+                                            <option value="3inches">3 inches</option>
+                                            <option value="4inches">4 inches</option>
+                                        </select></label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Color: <input type="input" ng-model="ticket.BindColor"></label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Binders <input type="input" ng-model="ticket.NumOBinders"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion4" data-target="#collapse4">Cleaning</a>
+                        </h4>
+                    </div>
+                    <div id="collapse4" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.GooGone" ng-true-value="1" ng-false-value="''">Goo Gone</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Goo Gone</h4>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of Goo Gones <input type="input" ng-model="ticket.NumOGooGone"></label>
+                                </div>            
+                            </div>
+
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.SwifferDusters" ng-true-value="1" ng-false-value="''">Swiffer Dusters</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Swiffer Dusters</h4>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of Dusters <input type="input" ng-model="ticket.NumOSwifferDuster" ng-true-value="1" ng-false-value="''"></label>
+                                </div>            
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.SwifferDusterRefills" ng-true-value="1" ng-false-value="''">Swiffer Duster Refills</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Swiffer Duster Refills</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Refills <input type="input" ng-model="ticket.NumOSwifferDust" ng-true-value="1" ng-false-value="''"></label>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.SwifferWetJetPads" ng-true-value="1" ng-false-value="''">Swiffer Wet Jet Pads</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Swiffer Wet Jet Pads</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Pads <input type="input" ng-model="ticket.NumOSwifferWetPads"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.SwifferWetJetCleaner" ng-true-value="1" ng-false-value="''">Swiffer Wet Jet Cleaner</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Swiffer Wet Jet Cleaner</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Cleaner <input type="input" ng-model="ticket.NumOSwifferWetClean"></label>
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion5" data-target="#collapse5">Desk Supplies</a>
+                        </h4>
+                    </div>
+                    <div id="collapse5" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BinderClips" ng-true-value="1" ng-false-value="''">Binder Clips</label>
+                                </div>-->
+                                <div class="col-xs-12">
+                                    <h4>Binder Clips</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BiClMini" ng-true-value="'Mini'" ng-false-value="''"> Mini</label><!--{{ticket.BiClMini}}-->
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BiClSmall" ng-true-value="'Small'" ng-false-value="''"> Small</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BiClMedium" ng-true-value="'Medium'" ng-false-value="''"> Medium</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BiClLarge" ng-true-value="'Large'" ng-false-value="''"> Large</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of clips <input type="input" ng-model="ticket.NumOBinderClips"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.Paperclips" ng-true-value="1" ng-false-value="''">Paperclips</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Paperclips</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.PClipsRegular" ng-true-value="'Regular'" ng-false-value="''"> Regular</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.PClipsJumbo" ng-true-value="'Jumbo'" ng-false-value="''"> Jumbo</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Paperclips <input type="input" ng-model="ticket.NumOPaperClips"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.Staples" ng-true-value="1" ng-false-value="''">Staples</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Staples</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.StapleRegular" ng-true-value="'Regular'" ng-false-value="''"> Regular</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.StapleElectric" ng-true-value="'Electric'" ng-false-value="''"> Electric</label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of Staples <input type="input" ng-model="ticket.NumOStaples"></label>
+                                </div>            
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.Stapler" ng-true-value="1" ng-false-value="''">Stapler</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Stapler</h4>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.StaplerRegular" ng-true-value="'Regular'" ng-false-value="''"> Regular</label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.StaplerElectric" ng-true-value="'Electric'" ng-false-value="''"> Electric</label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of Staplers <input type="input" ng-model="ticket.NumOStaplers"></label>
+                                </div>            
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.WhiteOut" ng-true-value="1" ng-false-value="''">White Out</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>White Out</h4>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.WOLiquid" ng-true-value="'Liquid'" ng-false-value="''"> Liquid</label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.WOTape" ng-true-value="'Tape'" ng-false-value="''"> Tape</label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of White Outs <input type="input" ng-model="ticket.NumOWhiteOut"></label>
+                                </div>            
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.AssortedDots" ng-true-value="1" ng-false-value="''">Assorted Dots</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Assorted Dots</h4>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label>Color: <input type="input" ng-model="ticket.AssortedDotsCol"></label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of Dots <input type="input" ng-model="ticket.NumOAssortedDots"></label>
+                                </div>            
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.Calendars" ng-true-value="1" ng-false-value="''">Calendars</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Calendars</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CalDeskPad" ng-true-value="'Desk Pad'" ng-false-value="''"> Desk Pad</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CalHanging" ng-true-value="'Hanging'" ng-false-value="''"> Hanging</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CalThrMonth" ng-true-value="'3 Month'" ng-false-value="''"> 3 Month</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CalMini" ng-true-value="'Mini'" ng-false-value="''"> Mini</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Calendars<input type="input" ng-model="ticket.NumOCalendar"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CalendarRefills" ng-true-value="1" ng-false-value="''">Calendar refills</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Calendar refills</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CalRefE7" ng-true-value="'E717-50'" ng-false-value="''"> E717-50</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CalRefE9" ng-true-value="'E919-50'" ng-false-value="''"> E919-50</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of refills <input type="input" ng-model="ticket.NumOCalRefills"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.Clipboards" ng-true-value="1" ng-false-value="''">Clipboards</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Clipboards</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.ClipbSmall" ng-true-value="'Small'" ng-false-value="''"> Small</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.ClipbRegular" ng-true-value="'Regular'" ng-false-value="''"> Regular</label>
+                                </div>
+
+                                <!--<div class="col-xs-12">
+                                    <label>Color: <input type="input" ng-model="ticket.ColorClipBoards"></label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <label># of Clipboards <input type="input" ng-model="ticket.NumOClipboards"></label>
+                                </div>                
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.ScotchTapeRefills" ng-true-value="1" ng-false-value="''">Scotch Tape Refills</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Scotch Tape Refills</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Refills <input type="input" ng-model="ticket.NumOScotch"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.AssortedLabels" ng-true-value="1" ng-false-value="''">Assorted Labels</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Assorted Labels</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Size <input type="input" ng-model="ticket.AssortLabSiz"></label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Color <input type="input" ng-model="ticket.AssortLabCol"></label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Labels <input type="input" ng-model="ticket.NumOAssortLab"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.NameBadges" ng-true-value="1" ng-false-value="''">Name Badges</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Name Badges</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Badges <input type="input" ng-model="ticket.NumONameBadge"></label>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion6" data-target="#collapse6">Circulation</a>
+                        </h4>
+                    </div>
+                    <div id="collapse6" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.RegisterTape" ng-true-value="1" ng-false-value="''">Register Tape</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Register Tape</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Tapes <input type="input" ng-model="ticket.NumORegTape" ng-true-value="1" ng-false-value="''"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.LibraryCards" ng-true-value="1" ng-false-value="''">Library Cards</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Library Cards</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Cards <input type="input" ng-model="ticket.NumOLibCards" ng-true-value="1" ng-false-value="''"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.PackingTape" ng-true-value="1" ng-false-value="''">Packing Tape</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Packing Tape</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Tapes <input type="input" ng-model="ticket.NumOPackTape"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.PinkSlips" ng-true-value="1" ng-false-value="''">Pink Slips</label>
+                                </div>-->
+                                <div class="col-xs-12">
+                                    <h4>Pink Slips</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Slips <input type="input" ng-model="ticket.NumOPinkSlips"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <div class="col-xs-12">
+                                    <h4>Receipt Paper Rolls</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Rolls <input type="input" ng-model="ticket.NumOReceiptRolls"></label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Cases <input type="input" ng-model="ticket.NumOReceiptRollCase"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <div class="col-xs-12">
+                                    <h4>Receipt Books</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Books <input type="input" ng-model="ticket.NumOReceiptBooks"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.CreditMachinePaperRolls" ng-true-value="1" ng-false-value="''">Credit Machine Paper Rolls</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Credit Machine Paper Rolls</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Rolls <input type="input" ng-model="ticket.NumOCreditMachine"></label>
+                                </div>
+                            </div> 
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion7" data-target="#collapse7">Miscellaneous</a>
+                        </h4>
+                    </div>
+                    <div id="collapse7" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.Batteries" ng-true-value="1" ng-false-value="''">Batteries</label>
+                                </div>--> 
+
+                                <div class="col-xs-12">
+                                    <h4>Batteries</h4>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BattAA" ng-true-value="'AA'" ng-false-value="''"> AA</label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BattAAA" ng-true-value="'AAA'" ng-false-value="''"> AAA</label>
+                                </div>            
+
+                                <div class="col-xs-12">
+                                    <label># of Batteries <input type="input" ng-model="ticket.NumOBatteries"></label>
+                                </div>            
+                            </div>
+
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BlueProcedureMasks" ng-true-value="1" ng-false-value="''">Blue Procedure Masks</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Blue Procedure Masks</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Masks <input type="input" ng-model="ticket.NumOBluePRMas"></label>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-6 col-sm-5 col-md-3 col-lg-2" style="border-style: solid;height: 200px; border-width: 1px;">
+                                <!--<div class="col-xs-12">
+                                    <label><input type="checkbox" ng-model="ticket.BlueProcedureMasks" ng-true-value="1" ng-false-value="''">Blue Procedure Masks</label>
+                                </div>-->
+
+                                <div class="col-xs-12">
+                                    <h4>Kleenex/Tissues</h4>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label># of Kleenex <input type="input" ng-model="ticket.NumOKleenex"></label>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="col-xs-12">
+                <!--<div class="col-xs-12">
+                    <label><input type="checkbox" ng-model="ticket.CalendarRefills" ng-true-value="1" ng-false-value="''">Calendar refills</label>
+                </div>-->
+                
+                <div class="col-xs-12">
+                    <h4>Comments:</h4>
+                </div>
+                
+                <div class="col-xs-12">
+                    <label><textarea ng-model="ticket.Comment" rows="10" cols="50"></textarea></label>
+                </div>
+            </div>
+            <input type="submit" ng-click="addTicket(ticket);" ng-model="ticket.ticketSend" id="send" value="Submit Order"/><!--redirect();-->
+        </div>
+    </ng-form>
+</div>
+    <div id="right" class="col-md-3 col-lg-2">
+
+    </div>
+<script type="text/javascript">
+            
+            (function($, ng) {
+  'use strict';
+
+  var $val = $.fn.val; // save original jQuery function
+
+  // override jQuery function
+  $.fn.val = function (value) {
+    // if getter, just return original
+    if (!arguments.length) {
+      return $val.call(this);
+    }
+
+    // get result of original function
+    var result = $val.call(this, value);
+
+    // trigger angular input (this[0] is the DOM object)
+    ng.element(this[0]).triggerHandler('input');
+
+    // return the original result
+    return result; 
+  }
+})(window.jQuery, window.angular);
+	</script>
+    <script>
+        var socket = io();
+         var $time = $('#timecheck');
+
+         socket.on('Login', function(res){
+             if (res == true)
+                 {
+                     var html = "Time is available";
+                     //$time.html(html);
+
+                   $('#timecheck').append($('<li>').text("Time is available"));
+                   console.log("Success");
+                 }
+             else
+                 {
+                     var html = "Time is not available";
+                     //$time.html(html);
+                    $('#timecheck').append($('<p>').text("Time is aleady taken"));
+                    console.log("Failed");
+                 }
+             console.log("Reached Socket.on available");
+         });
+        
+        socket.on('ChangeLoc', function(res){
+            var redirect = function(){window.location = 'http://E1WEB/epl/eventkeeper/events/#/';};
+            console.log("Reached ChangeLoc")
+            redirect();
+        })
+
+        socket.on('LoginResp', function(res){
+             $time.html(res);
+
+                   //$('#timecheck').append($('<li>').text("Time is available"));
+                   console.log("Success");
+         });
+    </script>
+    </body>
+</html>
